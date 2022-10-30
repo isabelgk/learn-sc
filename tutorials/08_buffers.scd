@@ -143,4 +143,32 @@ y = Synth.new(\playbuf_test, [\buf, ~b1.bufnum, \rate, 1.2, \loop, 1, \amp, 0.5]
 g.set(\rate, 0.5);
 g.free;
 
+
+
 // --- BufRd ---
+(
+SynthDef.new(\bufrd_test, {
+	arg amp=1, out=0, buf, start, end;
+	var sig, ptr;
+	ptr = Line.ar(start, end, BufDur.kr(buf), doneAction:2);
+	sig = BufRd.ar(2, buf, ptr);
+	sig = sig * amp;
+	Out.ar(out, sig);
+}).add;
+)
+
+Synth.new(\bufrd_test, [\buf, ~b0.bufnum, \start, 0, \end, ~b0.numFrames]);
+
+
+(
+SynthDef.new(\bufrd_loop, {
+	arg amp=1, out=0, buf, start, end, rate=1;
+	var sig, ptr;
+	ptr = Phasor.ar(0, BufRateScale.kr(buf) * rate, start, end);
+	sig = BufRd.ar(2, buf, ptr);
+	sig = sig * amp;
+	Out.ar(out, sig);
+}).add;
+)
+x = Synth.new(\bufrd_loop, [\buf, ~b0.bufnum, \start, 0, \end, ~b0.numFrames]);
+
